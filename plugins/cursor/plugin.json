@@ -1,0 +1,39 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "cursor",
+  "version": "0.1.0",
+  "description": "Use the local Cursor CLI from Codex for reviews, questions, and rescue tasks.",
+  "author": {
+    "name": "cursor-in-codex"
+  },
+  "homepage": "https://cursor.com/cli",
+  "license": "MIT",
+  "keywords": [
+    "cursor",
+    "cursor-cli",
+    "codex",
+    "mcp",
+    "code-review",
+    "delegation"
+  ],
+  "extensions": {
+    "com.openai": {
+      "mcpServers": "./.mcp.json",
+      "interface": {
+        "displayName": "Cursor CLI",
+        "shortDescription": "Delegate reviews, questions, and rescue tasks to Cursor CLI",
+        "longDescription": "Use the local Cursor agent CLI from Codex for read-only reviews, ask-mode questions, write-capable rescue jobs, live model discovery, and background job control. Codex stays the host. Cursor runs on your machine with your existing login or CURSOR_API_KEY.",
+        "developerName": "cursor-in-codex",
+        "category": "Coding",
+        "capabilities": ["Read", "Write", "Interactive"],
+        "websiteURL": "https://cursor.com/cli",
+        "defaultPrompt": [
+          "Ask Cursor to review this branch against main.",
+          "List Cursor models that match grok.",
+          "Have Cursor fix the failing auth test."
+        ],
+        "brandColor": "#F54E00"
+      }
+    }
+  }
+}

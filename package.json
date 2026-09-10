@@ -1,0 +1,21 @@
+{
+  "name": "cursor-in-codex",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Codex plugin that delegates reviews, questions, and rescue tasks to the local Cursor CLI",
+  "type": "module",
+  "engines": {
+    "node": ">=18.18"
+  },
+  "scripts": {
+    "companion": "node plugins/cursor/scripts/cursor-companion.mjs",
+    "mcp": "node plugins/cursor/mcp/server.mjs",
+    "setup": "node plugins/cursor/scripts/cursor-companion.mjs setup",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maplenk/codex-cursor-cli.git"
+  },
+  "license": "MIT"
+}

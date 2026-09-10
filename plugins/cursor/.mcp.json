@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "cursor": {
+      "command": "node",
+      "args": ["./mcp/server.mjs"],
+      "cwd": "."
+    }
+  }
+}
