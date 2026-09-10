@@ -6,7 +6,7 @@ import readline from "node:readline";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-const SERVER_VERSION = "0.1.0";
+const SERVER_VERSION = "0.1.2";
 const ROOT_DIR = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const COMPANION = path.join(ROOT_DIR, "scripts", "cursor-companion.mjs");
 
@@ -140,6 +140,7 @@ const TOOL_DEFINITIONS = [
     inputSchema: {
       type: "object",
       additionalProperties: false,
+      required: [],
       properties: {
         ...WORKSPACE_PROPERTY,
         jobId: stringSchema("Specific job id. Omit only when there is one unambiguous recent job."),
