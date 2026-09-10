@@ -55,7 +55,7 @@ enabled = true
 default_tools_approval_mode = "prompt"
 ```
 
-Check with `codex mcp list` and `/mcp`. `node` must be on PATH for the Codex process. If `cursor_*` tools are still missing, run `node "$PLUGIN_ROOT/scripts/cursor-companion.mjs" ...` — do not call `agent` directly.
+Check with `codex mcp list` and `/mcp`. `node` must be on PATH for the Codex process. If `cursor_*` tools are still missing, run the companion from this plugin (`../../scripts/cursor-companion.mjs` relative to `skills/cursor-routing/SKILL.md`, or `$PLUGIN_ROOT/scripts/cursor-companion.mjs`) as `node "$COMPANION" <command> --cwd <workspace> --json [flags] -- <prompt>`. Do not call `agent` directly. Do not pin a `~/.codex/plugins/cache/.../<version>/` path.
 
 ## Auth and binary
 

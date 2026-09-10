@@ -29,27 +29,32 @@ If `cursor_setup`, `cursor_models`, `cursor_ask`, `cursor_review`, `cursor_adver
 
 Use this when the `cursor_*` tools are missing (plugin skills loaded, MCP not approved, or Codex needs a full restart).
 
-Companion path, in order:
-
-1. `$PLUGIN_ROOT/scripts/cursor-companion.mjs`
-2. This skill's plugin root: the directory that contains `skills/` and `scripts/`
-3. Cache default: `~/.codex/plugins/cache/cursor-cli/cursor/0.1.2/scripts/cursor-companion.mjs`
+This skill lives at `skills/cursor-routing/SKILL.md`. Resolve the companion from **this file**, not a versioned cache path (those break after upgrades and cachebusters):
 
 ```bash
-node "$PLUGIN_ROOT/scripts/cursor-companion.mjs" <command> --cwd <workspace> --json [flags] [prompt]
+# From this skill: ../../scripts/cursor-companion.mjs
+SKILL_DIR="$(cd "$(dirname "$SKILL_MD")" && pwd)"   # .../skills/cursor-routing
+COMPANION="$(cd "$SKILL_DIR/../.." && pwd)/scripts/cursor-companion.mjs"
+# Or, when set: "$PLUGIN_ROOT/scripts/cursor-companion.mjs"
+```
+
+Always put prompts and job ids after `--`. `--json` is a boolean flag; a following bare word is consumed as its value and the prompt is lost.
+
+```bash
+node "$COMPANION" <command> --cwd <workspace> --json [flags] -- <prompt>
 ```
 
 | MCP tool | Companion command |
 | --- | --- |
-| `cursor_setup` | `setup --json --cwd <workspace>` |
-| `cursor_models` | `models --json --cwd <workspace> --query <q>` |
-| `cursor_ask` | `ask --json --cwd <workspace> [--model <slug>] -- <prompt>` |
-| `cursor_review` | `review --json --cwd <workspace> [--model <slug>] [--base <ref>] [--scope auto\|working-tree\|branch] -- <focus>` |
-| `cursor_adversarial_review` | `adversarial-review --json --cwd <workspace> ...` |
-| `cursor_rescue` | `rescue --json --cwd <workspace> [--model <slug>] [--write] -- <prompt>` |
-| `cursor_status` | `status --json --cwd <workspace> [<jobId>]` |
-| `cursor_result` | `result --json --cwd <workspace> [<jobId>]` |
-| `cursor_cancel` | `cancel --json --cwd <workspace> <jobId>` |
+| `cursor_setup` | `setup --cwd <workspace> --json` |
+| `cursor_models` | `models --cwd <workspace> --json --query <q>` |
+| `cursor_ask` | `ask --cwd <workspace> --json [--model <slug>] -- <prompt>` |
+| `cursor_review` | `review --cwd <workspace> --json [--model <slug>] [--base <ref>] [--scope auto\|working-tree\|branch] -- <focus>` |
+| `cursor_adversarial_review` | `adversarial-review --cwd <workspace> --json [flags] -- <focus>` |
+| `cursor_rescue` | `rescue --cwd <workspace> --json [--model <slug>] [--write] -- <prompt>` |
+| `cursor_status` | `status --cwd <workspace> --json -- [<jobId>]` |
+| `cursor_result` | `result --cwd <workspace> --json -- [<jobId>]` |
+| `cursor_cancel` | `cancel --cwd <workspace> --json -- <jobId>` |
 
 After a fallback run, tell the user how to load the MCP tools for next time:
 
