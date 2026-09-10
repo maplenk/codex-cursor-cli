@@ -2,7 +2,7 @@
 
 Codex stays the host thread. This plugin delegates reviews, questions, and rescue work to the local [Cursor CLI](https://cursor.com/cli) (`agent` / `cursor-agent`) through a bundled MCP server and companion.
 
-Typed MCP tools are the API. Skills only tell Codex which tool to call. Cursor runs in **print mode**, not ACP.
+Typed MCP tools are the preferred API. Skills route to those tools, and fall back to `cursor-companion.mjs` when Codex has not loaded the plugin MCP server. Cursor runs in **print mode**, not ACP.
 
 ## Install
 
@@ -20,14 +20,24 @@ codex plugin marketplace add /path/to/this-repo
 codex plugin add cursor@cursor-cli
 ```
 
-Enable the plugin, then start a **new** Codex thread so the MCP server loads:
+Enable the plugin **and** its bundled MCP server in `~/.codex/config.toml`:
 
 ```toml
 [plugins."cursor@cursor-cli"]
 enabled = true
+
+[plugins."cursor@cursor-cli".mcp_servers.cursor]
+enabled = true
+default_tools_approval_mode = "prompt"
 ```
 
-Ask Codex to call `cursor_setup`, or run the companion directly:
+Then fully quit and relaunch Codex (a new thread is often not enough), approve the `cursor` MCP server, and check `codex mcp list` or `/mcp`. `node` must be on PATH for the Codex process.
+
+If `cursor_*` tools are still missing, skills should run the companion instead of stopping:
+
+```bash
+node plugins/cursor/scripts/cursor-companion.mjs setup --json
+```
 
 ```bash
 node plugins/cursor/scripts/cursor-companion.mjs setup

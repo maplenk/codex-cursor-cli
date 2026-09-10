@@ -1,6 +1,6 @@
 ---
 name: cursor-cli-runtime
-description: Cursor CLI print-mode flags, live model pass, cwd, jobs, and auth. Use when invoking cursor_* MCP tools, choosing --model slugs, --mode ask, --force writes, --resume, or diagnosing agent login / deny lists.
+description: Cursor CLI print-mode flags, live model pass, cwd, jobs, auth, and how to enable plugin MCP or fall back to cursor-companion.mjs. Use for --model slugs, --mode ask, --force writes, or missing cursor_* tools.
 ---
 
 # Cursor CLI runtime
@@ -42,9 +42,24 @@ Cursor has no `--effort` flag. Reasoning and Fast are slug suffixes.
 
 Every tool needs `cwd`. Honor `PLUGIN_ROOT` / `PLUGIN_DATA` (and `CLAUDE_PLUGIN_*` aliases). Job state lives under `CURSOR_CODEX_PLUGIN_STATE` or a trusted `PLUGIN_DATA` whose basename is `cursor` / `cursor-*`. Do not share another plugin's job directory.
 
+## Plugin MCP vs companion
+
+Skills install with the plugin. Bundled MCP tools do not. Enable the server, then fully relaunch Codex:
+
+```toml
+[plugins."cursor@cursor-cli"]
+enabled = true
+
+[plugins."cursor@cursor-cli".mcp_servers.cursor]
+enabled = true
+default_tools_approval_mode = "prompt"
+```
+
+Check with `codex mcp list` and `/mcp`. `node` must be on PATH for the Codex process. If `cursor_*` tools are still missing, run `node "$PLUGIN_ROOT/scripts/cursor-companion.mjs" ...` — do not call `agent` directly.
+
 ## Auth and binary
 
-- Binary: `CURSOR_AGENT` / `AGENT_BIN`, then `agent`, `cursor-agent`, `~/.local/bin/agent`, `~/.cursor/bin/agent`
+- Binary: `CURSOR_AGENT` / `AGENT_BIN`, then `cursor-agent`, `agent`, `~/.local/bin/agent`, `~/.cursor/bin/agent`. Prefer `cursor-agent` so another CLI named `agent` does not win.
 - Install: `curl https://cursor.com/install -fsS | bash`
 - Login: `agent login`, or `CURSOR_API_KEY` / `--api-key`. `CURSOR_AUTH_TOKEN` is also accepted.
 - Probe: `cursor_setup` runs `agent status --format json` (or `whoami`)
