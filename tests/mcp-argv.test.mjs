@@ -26,9 +26,10 @@ test("buildCompanionInvocation forwards model, cwd, and review flags", () => {
     "main",
     "--scope",
     "branch",
-    "auth",
     "--cwd",
-    path.resolve(cwd)
+    path.resolve(cwd),
+    "--",
+    "auth"
   ]);
   assert.equal(invocation.cwd, path.resolve(cwd));
 });
@@ -52,7 +53,7 @@ test("buildCompanionInvocation maps rescue write and resume session", () => {
     model: "composer-2.5",
     cwd: "/workspace"
   });
-  assert.deepEqual(invocation.args.slice(0, 10), [
+  assert.deepEqual(invocation.args, [
     "rescue",
     "--model",
     "composer-2.5",
@@ -60,9 +61,10 @@ test("buildCompanionInvocation maps rescue write and resume session", () => {
     "sess_123",
     "--write",
     "--fresh",
-    "fix the failing auth test",
     "--cwd",
-    path.resolve("/workspace")
+    path.resolve("/workspace"),
+    "--",
+    "fix the failing auth test"
   ]);
 });
 

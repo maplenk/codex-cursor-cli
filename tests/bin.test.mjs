@@ -46,6 +46,20 @@ test("bare agent is resolved from PATH", () => {
   fs.rmSync(root, { recursive: true, force: true });
 });
 
+test("cursor-agent wins when another CLI owns agent earlier on PATH", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "cursor-bin-"));
+  try {
+    const otherAgent = makeExecutable(path.join(root, "grok", "agent"));
+    const cursorAgent = makeExecutable(path.join(root, "cursor", "cursor-agent"));
+    const resolved = resolveCursorBinary({
+      PATH: [path.dirname(otherAgent), path.dirname(cursorAgent)].join(path.delimiter)
+    });
+    assert.equal(resolved, cursorAgent);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("candidate list includes documented install locations", () => {
   const candidates = candidateBinaries({});
   assert.ok(candidates.includes("agent"));

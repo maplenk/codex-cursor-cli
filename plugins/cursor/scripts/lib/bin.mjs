@@ -9,8 +9,8 @@ export function candidateBinaries(env = process.env) {
   const explicit = [env.CURSOR_AGENT, env.AGENT_BIN].filter(Boolean);
   return [
     ...explicit,
-    "agent",
     "cursor-agent",
+    "agent",
     path.join(HOME, ".local", "bin", "agent"),
     path.join(HOME, ".cursor", "bin", "agent"),
     path.join(HOME, ".local", "bin", "cursor-agent"),

@@ -247,6 +247,8 @@ async function runAgentJob(options) {
     argv: [binary, ...agentArgs],
     status: background ? "running" : "running"
   });
+  // The detached worker rewrites this record; retain a live PID for status polling.
+  job.pid = process.pid;
   saveJob(cwd, job, env);
 
   if (background && !flagValue(flags, "jobId")) {

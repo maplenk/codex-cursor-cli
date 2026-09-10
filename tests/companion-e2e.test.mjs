@@ -6,6 +6,7 @@ import { spawn } from "node:child_process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { buildAgentArgv } from "../plugins/cursor/scripts/lib/invoke.mjs";
+import { buildCompanionInvocation } from "../plugins/cursor/mcp/server.mjs";
 
 const COMPANION = fileURLToPath(new URL("../plugins/cursor/scripts/cursor-companion.mjs", import.meta.url));
 const FAKE_AGENT = fileURLToPath(new URL("./fixtures/fake-agent.mjs", import.meta.url));
@@ -161,4 +162,54 @@ test("companion models filters the live catalog", async () => {
   assert.ok(payload.models.some((model) => model.id === "grok-4.6"));
   assert.ok(payload.models.every((model) => model.id.includes("grok") || String(model.label).toLowerCase().includes("grok")));
   fs.rmSync(root, { recursive: true, force: true });
+});
+
+test("MCP invocation preserves prompts after flags and job IDs after json", async () => {
+  const { root, record, env } = isolatedWorkspace();
+  try {
+    for (const [tool, extra] of [["cursor_ask", {}], ["cursor_rescue", { write: true, fresh: true }]]) {
+      const prompt = "--explain this literally without treating it as an option";
+      const invocation = buildCompanionInvocation(tool, { cwd: root, json: true, prompt, ...extra });
+      const result = await runCompanion(invocation.args, env, root);
+      assert.equal(result.code, 0, result.stderr);
+      const payload = JSON.parse(result.stdout);
+      assert.equal(payload.status, "ok");
+      assert.ok(JSON.parse(fs.readFileSync(record, "utf8")).argv.includes(prompt));
+      const statusArgs = buildCompanionInvocation("cursor_status", { cwd: root, json: true, jobId: payload.jobId });
+      const status = await runCompanion(statusArgs.args, env, root);
+      assert.equal(status.code, 0, status.stderr);
+      assert.equal(JSON.parse(status.stdout).job.id, payload.jobId);
+    }
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("background MCP jobs remain running while the detached worker is alive", async () => {
+  const { root, record, env } = isolatedWorkspace();
+  env.FAKE_AGENT_DELAY_MS = "1500";
+  try {
+    const invocation = buildCompanionInvocation("cursor_ask", { cwd: root, json: true, background: true, prompt: "hello" });
+    const start = await runCompanion(invocation.args, env, root);
+    assert.equal(start.code, 0, start.stderr);
+    const { jobId } = JSON.parse(start.stdout);
+    for (let i = 0; i < 100 && !fs.existsSync(record); i++) {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+    assert.ok(fs.existsSync(record), "detached worker should start the agent");
+    const statusArgs = buildCompanionInvocation("cursor_status", { cwd: root, json: true, jobId }).args;
+    const running = JSON.parse((await runCompanion(statusArgs, env, root)).stdout);
+    assert.equal(running.job.status, "running");
+    assert.ok(running.job.pid > 0);
+    let finished;
+    for (let i = 0; i < 100; i++) {
+      finished = JSON.parse((await runCompanion(statusArgs, env, root)).stdout);
+      if (finished.job.status !== "running") break;
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    }
+    assert.equal(finished.job.status, "completed");
+    assert.equal(finished.result.status, "ok");
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });

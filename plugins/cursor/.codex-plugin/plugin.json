@@ -1,6 +1,6 @@
 {
   "name": "cursor",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260910125403",
   "description": "Use the local Cursor CLI from Codex for reviews, questions, and rescue tasks.",
   "author": {
     "name": "cursor-in-codex"
@@ -23,7 +23,11 @@
     "longDescription": "Use the local Cursor agent CLI from Codex for read-only reviews, ask-mode questions, write-capable rescue jobs, live model discovery, and background job control.",
     "developerName": "cursor-in-codex",
     "category": "Coding",
-    "capabilities": ["Read", "Write", "Interactive"],
+    "capabilities": [
+      "Read",
+      "Write",
+      "Interactive"
+    ],
     "websiteURL": "https://cursor.com/cli",
     "defaultPrompt": [
       "Ask Cursor to review this branch against main.",

@@ -41,7 +41,7 @@ Install the CLI if it is missing:
 curl https://cursor.com/install -fsS | bash
 ```
 
-The companion looks for `CURSOR_AGENT` / `AGENT_BIN`, then `agent`, `cursor-agent`, `~/.local/bin/agent`, and `~/.cursor/bin/agent`.
+The companion looks for `CURSOR_AGENT` / `AGENT_BIN`, then `cursor-agent`, `agent`, `~/.local/bin/agent`, and `~/.cursor/bin/agent`. The Cursor-specific executable takes priority so another CLI's `agent` command does not shadow Cursor.
 
 ## Tools
 

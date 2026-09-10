@@ -218,6 +218,7 @@ export function buildCompanionInvocation(toolName, input = {}) {
   }
 
   const args = [];
+  const positionals = [];
   switch (toolName) {
     case "cursor_setup":
       args.push("setup");
@@ -232,7 +233,7 @@ export function buildCompanionInvocation(toolName, input = {}) {
       args.push("ask");
       appendCommonArgs(args, input);
       if (hasValue(input.prompt)) {
-        args.push(String(input.prompt));
+        positionals.push(String(input.prompt));
       }
       break;
     case "cursor_review":
@@ -241,7 +242,7 @@ export function buildCompanionInvocation(toolName, input = {}) {
       pushValue(args, input.base, "--base");
       pushValue(args, input.scope, "--scope");
       if (hasValue(input.focus) || hasValue(input.prompt)) {
-        args.push(String(input.focus || input.prompt));
+        positionals.push(String(input.focus || input.prompt));
       }
       break;
     case "cursor_adversarial_review":
@@ -250,7 +251,7 @@ export function buildCompanionInvocation(toolName, input = {}) {
       pushValue(args, input.base, "--base");
       pushValue(args, input.scope, "--scope");
       if (hasValue(input.focus) || hasValue(input.prompt)) {
-        args.push(String(input.focus || input.prompt));
+        positionals.push(String(input.focus || input.prompt));
       }
       break;
     case "cursor_rescue":
@@ -259,7 +260,7 @@ export function buildCompanionInvocation(toolName, input = {}) {
       pushFlag(args, input.write, "--write");
       pushFlag(args, input.fresh, "--fresh");
       if (hasValue(input.prompt)) {
-        args.push(String(input.prompt));
+        positionals.push(String(input.prompt));
       }
       break;
     case "cursor_status":
@@ -267,27 +268,32 @@ export function buildCompanionInvocation(toolName, input = {}) {
       pushFlag(args, input.all, "--all");
       pushFlag(args, input.json, "--json");
       if (hasValue(input.jobId)) {
-        args.push(String(input.jobId));
+        positionals.push(String(input.jobId));
       }
       break;
     case "cursor_result":
       args.push("result");
       pushFlag(args, input.json, "--json");
       if (hasValue(input.jobId)) {
-        args.push(String(input.jobId));
+        positionals.push(String(input.jobId));
       }
       break;
     case "cursor_cancel":
       args.push("cancel");
       pushFlag(args, input.json, "--json");
       if (hasValue(input.jobId)) {
-        args.push(String(input.jobId));
+        positionals.push(String(input.jobId));
       }
       break;
   }
 
   if (hasValue(input.cwd)) {
     args.push("--cwd", path.resolve(String(input.cwd)));
+  }
+
+  // Keep prompts and job IDs from being consumed as flag values or options.
+  if (positionals.length) {
+    args.push("--", ...positionals);
   }
 
   return { command: args[0], args, cwd: hasValue(input.cwd) ? path.resolve(String(input.cwd)) : undefined };

@@ -49,6 +49,9 @@ if (argv[0] === "status" || argv[0] === "whoami") {
 }
 
 if (argv.includes("-p")) {
+  if (process.env.FAKE_AGENT_DELAY_MS) {
+    await new Promise((resolve) => setTimeout(resolve, Number(process.env.FAKE_AGENT_DELAY_MS)));
+  }
   const modelIndex = argv.indexOf("--model");
   const model = modelIndex >= 0 ? argv[modelIndex + 1] : null;
   const prompt = argv.filter((token) => !token.startsWith("-")).at(-1) || "";
